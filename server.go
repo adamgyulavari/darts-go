@@ -84,6 +84,7 @@ func main() {
 	adm.GET("/start", func(c *gin.Context) {
 		game.GetGame().Status = model.StatusStarted
 		game.GetGame().Name = c.Query("gameType")
+		game.GetGame().SubType = c.Query("gameSubType")
 		game.SendGameDataToClients(game.WebsocketGameStarted)
 		c.Redirect(301, "/admin/throws")
 	})
@@ -93,6 +94,10 @@ func main() {
 		c.Redirect(301, "/admin/setPlayer")
 	})
 	adm.GET("/setPlayer", func(c *gin.Context) {
+		if game.GetGame().Status != model.StatusCreate {
+			c.Redirect(301, "/admin/throws")
+			return
+		}
 		c.HTML(200, "start-game.html", gin.H{})
 	})
 	// ADMIN group end
